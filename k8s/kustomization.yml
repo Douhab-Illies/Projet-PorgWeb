@@ -5,4 +5,3 @@ resources:
   - deployment.yaml
   - ingress.yaml
   - loadbalancing-service.yml
-#  - service.yml

@@ -13,3 +13,13 @@ spec:
   selector:
     app: myservice
   type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bdd-service
+spec:
+  selector:
+    app: bdd
+  ports:
+    - port: 543

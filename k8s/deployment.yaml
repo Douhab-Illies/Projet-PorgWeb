@@ -13,7 +13,27 @@ spec:
         app: myservice
     spec:
       containers:
-        - image: illiesdhb/app_chemin:1
+        - image: illiesdhb/projweb-front-app:1.0
           imagePullPolicy: IfNotPresent
           name: myservice
       restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bdd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bdd
+  template:
+    metadata:
+      labels:
+        app: bdd
+    spec:
+      containers:
+        - name: postgres
+          image: illies/projweb-bdd:latest
+          ports:
+            - containerPort: 5432
