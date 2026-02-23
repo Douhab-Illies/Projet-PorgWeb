@@ -13,7 +13,7 @@ spec:
         app: myservice
     spec:
       containers:
-        - image: illiesdhb/projweb-front-app:1.0
+        - image: illiesdhb/projweb-front-app:2.1
           imagePullPolicy: IfNotPresent
           name: myservice
       restartPolicy: Always
@@ -34,6 +34,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: illies/projweb-bdd:latest
+          image: illiesdhb/projweb-back-app:1.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432

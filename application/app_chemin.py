@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # Configuration PostgreSQL
 DB_CONFIG = {
-    "host": "container-bdd",
+    "host": "bdd-service",
     "dbname": "application",
     "user": "postgres",
     "password": "postgres"
