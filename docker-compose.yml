@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: orders
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d orders"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  catalog-service:
+    build: ./services/catalog-service
+    environment:
+      PORT: "3001"
+      GRPC_PORT: "50051"
+      NODE_ENV: "production"
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  order-service:
+    build: ./services/order-service
+    environment:
+      PORT: "3002"
+      NODE_ENV: "production"
+      DATABASE_URL: "postgresql://app:app@postgres:5432/orders"
+      CATALOG_GRPC_HOST: "catalog-service"
+      CATALOG_GRPC_PORT: "50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      catalog-service:
+        condition: service_healthy
+    ports:
+      - "3002:3002"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3002/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  api-gateway:
+    build: ./gateway
+    environment:
+      PORT: "8081"
+      CATALOG_URL: "http://catalog-service:3001"
+      ORDER_URL: "http://order-service:3002"
+    depends_on:
+      catalog-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8081/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: ./frontend
+    depends_on:
+      api-gateway:
+        condition: service_started
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:
