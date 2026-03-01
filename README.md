@@ -64,11 +64,3 @@ kubectl apply -n micro-20 -f k8s/istio/20-gateway.yaml
 kubectl apply -n micro-20 -f k8s/istio/30-virtualservice.yaml
 ```
 
-## Docker Hub (build & push)
-Édite `DOCKERHUB_USER` dans `scripts/push.sh` puis:
-```bash
-bash scripts/push.sh 1.0.0
-```
-
-## Rapport
-Un template est fourni: `docs/mini-rapport.md`.
